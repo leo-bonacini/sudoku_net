@@ -21,9 +21,9 @@ import numpy as np
 import torch
 import torch.nn.functional as F
 from PIL import Image
-from torchvision import transforms
 
-from model import SudokuGridNet
+from dataset import build_transform
+from model import load_checkpoint
 
 # =====================================================================
 # Sequential colormap: single hue (blue), light -> dark. 13 stops, 100-700.
@@ -126,10 +126,8 @@ def predict_grid(model, pil_image, image_size):
     Used by server.py's /recognize and /sample endpoints (no activation hooks needed)."""
     model.eval()
     device = next(model.parameters()).device
-    img = pil_image.convert("RGB").resize((image_size, image_size), Image.BILINEAR)
-    tensor = transforms.Compose([
-        transforms.ToTensor(), transforms.Normalize([0.5] * 3, [0.5] * 3),
-    ])(img).unsqueeze(0).to(device)
+    img = pil_image.convert("RGB")
+    tensor = build_transform(image_size)(img).unsqueeze(0).to(device)
     with torch.no_grad():
         logits = model(tensor)
     probs = F.softmax(logits, dim=1)[0].cpu().numpy()
@@ -140,9 +138,7 @@ def _load_sample(data_root, record, image_size):
     path = Path(data_root) / "images" / record["file"]
     img = Image.open(path).convert("RGB").resize((image_size, image_size), Image.BILINEAR)
     base_uint8 = np.array(img)
-    tensor = transforms.Compose([
-        transforms.ToTensor(), transforms.Normalize([0.5] * 3, [0.5] * 3),
-    ])(img).unsqueeze(0)
+    tensor = build_transform(image_size)(img).unsqueeze(0)
     label = None
     if "grid" in record:
         label = torch.tensor([int(c) for c in record["grid"]], dtype=torch.long).view(9, 9)
@@ -420,7 +416,7 @@ footer { margin-top: 48px; padding-top: 16px; border-top: 1px solid var(--border
 .train-btn.primary { background: var(--accent); }
 .train-btn.secondary { background: var(--page); color: var(--ink); border: 1px solid var(--border); }
 .board-grid input.board-cell {
-  width: 100%; height: 100%; border: none; background: transparent; outline: none;
+  width: 100%; height: 100%; background: transparent; outline: none;
   text-align: center; font: inherit; color: inherit; padding: 0;
 }
 .board-grid input.board-cell:focus { outline: 2px solid var(--accent); outline-offset: -2px; z-index: 2; }
@@ -903,18 +899,14 @@ def _cli():
 def main():
     args = _cli()
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    ckpt = torch.load(args.checkpoint, map_location=device)
-    image_size = ckpt["args"]["image_size"]
-
-    model = SudokuGridNet().to(device)
-    model.load_state_dict(ckpt["model"])
+    model, image_size, epoch = load_checkpoint(args.checkpoint, device)
 
     with open(Path(args.data) / "labels.jsonl") as f:
         records = [json.loads(line) for line in f if line.strip()]
     record = next((r for r in records if r["file"] == args.file), records[0]) if args.file else records[0]
 
     out = build_dashboard(model, args.data, record, args.out, image_size=image_size,
-                           checkpoint_meta={"epoch": ckpt.get("epoch")})
+                           checkpoint_meta={"epoch": epoch})
     print(f"Wrote {out}")
 
 

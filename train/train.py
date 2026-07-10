@@ -15,7 +15,7 @@ from torch import nn
 from torch.utils.data import DataLoader
 
 from dataset import SudokuImageDataset
-from model import SudokuGridNet
+from model import SudokuGridNet, load_checkpoint
 from visualize import build_dashboard
 
 
@@ -128,7 +128,7 @@ def main():
     print(f"Done. Best val board accuracy: {best_board_acc:.4%}. Checkpoints in {out_dir}")
 
     if args.dashboard:
-        model.load_state_dict(torch.load(out_dir / "best.pt", map_location=device)["model"])
+        model, _, _ = load_checkpoint(out_dir / "best.pt", device)
         sample_record = val_ds.records[0]
         dashboard_path = build_dashboard(
             model, args.data, sample_record, out_dir / "dashboard.html",

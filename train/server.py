@@ -22,7 +22,7 @@ import torch
 from flask import Flask, Response, jsonify, request
 from PIL import Image
 
-from model import SudokuGridNet
+from model import load_checkpoint
 from solver import find_conflicts, solve as solve_grid
 from visualize import predict_grid, render_empty_state
 
@@ -45,11 +45,8 @@ def _get_model():
     mtime = ckpt_path.stat().st_mtime
     if _model_cache["model"] is None or _model_cache["mtime"] != mtime:
         device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-        ckpt = torch.load(ckpt_path, map_location=device, weights_only=False)
-        model = SudokuGridNet().to(device)
-        model.load_state_dict(ckpt["model"])
-        model.eval()
-        _model_cache.update(model=model, image_size=ckpt["args"]["image_size"], mtime=mtime)
+        model, image_size, _ = load_checkpoint(ckpt_path, device)
+        _model_cache.update(model=model, image_size=image_size, mtime=mtime)
     return _model_cache["model"], _model_cache["image_size"]
 
 _lock = threading.Lock()

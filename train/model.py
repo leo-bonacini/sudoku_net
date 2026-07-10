@@ -9,6 +9,7 @@ class score (blank + digits 1-9), giving an (N, 10, 9, 9) output that is
 equivalent to "81 outputs" but shares weights across cells and stays robust to
 the image not being pixel-perfectly aligned.
 """
+import torch
 import torch.nn as nn
 
 from dataset import NUM_CLASSES
@@ -41,3 +42,13 @@ class SudokuGridNet(nn.Module):
     def forward(self, x):
         x = self.backbone(x)
         return self.head(x)  # (N, num_classes, 9, 9)
+
+
+def load_checkpoint(path, device):
+    """Loads a checkpoint saved by train.py and returns (model, image_size, epoch),
+    with the model in eval mode on `device`."""
+    ckpt = torch.load(path, map_location=device, weights_only=False)
+    model = SudokuGridNet().to(device)
+    model.load_state_dict(ckpt["model"])
+    model.eval()
+    return model, ckpt["args"]["image_size"], ckpt.get("epoch")

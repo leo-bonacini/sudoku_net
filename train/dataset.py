@@ -10,6 +10,19 @@ from torchvision import transforms
 NUM_CLASSES = 10  # 0 = blank cell, 1-9 = digit
 
 
+def build_transform(image_size, augment=False):
+    """The preprocessing pipeline shared by training, prediction, and the
+    dashboard: resize to a square, optional photometric jitter, then the same
+    tensor normalization the model was trained with."""
+    ops = [transforms.Resize((image_size, image_size))]
+    if augment:
+        # Only photometric jitter: the model relies on each cell landing in a
+        # fixed spatial location, so geometric augmentation would fight that.
+        ops.append(transforms.ColorJitter(brightness=0.2, contrast=0.2, saturation=0.2))
+    ops += [transforms.ToTensor(), transforms.Normalize([0.5] * 3, [0.5] * 3)]
+    return transforms.Compose(ops)
+
+
 class SudokuImageDataset(Dataset):
     def __init__(self, root, indices=None, image_size=288, augment=False):
         self.root = Path(root)
@@ -18,13 +31,7 @@ class SudokuImageDataset(Dataset):
         if indices is not None:
             self.records = [self.records[i] for i in indices]
 
-        ops = [transforms.Resize((image_size, image_size))]
-        if augment:
-            # Only photometric jitter: the model relies on each cell landing in a
-            # fixed spatial location, so geometric augmentation would fight that.
-            ops.append(transforms.ColorJitter(brightness=0.2, contrast=0.2, saturation=0.2))
-        ops += [transforms.ToTensor(), transforms.Normalize([0.5] * 3, [0.5] * 3)]
-        self.transform = transforms.Compose(ops)
+        self.transform = build_transform(image_size, augment=augment)
 
     def __len__(self):
         return len(self.records)

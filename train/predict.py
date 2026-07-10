@@ -9,9 +9,9 @@ import argparse
 
 import torch
 from PIL import Image
-from torchvision import transforms
 
-from model import SudokuGridNet
+from dataset import build_transform
+from model import load_checkpoint
 
 
 def parse_args():
@@ -33,18 +33,9 @@ def main():
     args = parse_args()
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-    ckpt = torch.load(args.checkpoint, map_location=device)
-    image_size = ckpt["args"]["image_size"]
+    model, image_size, _ = load_checkpoint(args.checkpoint, device)
 
-    model = SudokuGridNet().to(device)
-    model.load_state_dict(ckpt["model"])
-    model.eval()
-
-    transform = transforms.Compose([
-        transforms.Resize((image_size, image_size)),
-        transforms.ToTensor(),
-        transforms.Normalize([0.5] * 3, [0.5] * 3),
-    ])
+    transform = build_transform(image_size)
     img = transform(Image.open(args.image).convert("RGB")).unsqueeze(0).to(device)
 
     with torch.no_grad():
