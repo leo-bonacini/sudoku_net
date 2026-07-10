@@ -1,0 +1,18 @@
+# Dependencies
+dataset_gen/node_modules/
+
+# Generated dataset (regenerate with dataset_gen/run.sh)
+dataset_gen/output/
+
+# Training artifacts (regenerate with train/train.py)
+train/checkpoints/
+
+# Python
+__pycache__/
+*.pyc
+
+# Editor / OS
+.DS_Store
+
+# Local Claude Code config (not meant to be shared)
+.claude/

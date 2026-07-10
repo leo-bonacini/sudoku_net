@@ -1,0 +1,13 @@
+{
+  "name": "sudoku-dataset-gen",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Generates a labeled image database of Sudoku boards for training an ANN, by driving the sudoku game in a headless browser.",
+  "type": "commonjs",
+  "scripts": {
+    "generate": "node generate.js"
+  },
+  "dependencies": {
+    "playwright": "1.61.1"
+  }
+}

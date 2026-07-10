@@ -1,0 +1,17 @@
+# Requires the NVIDIA Container Toolkit on the host for GPU access:
+# https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html
+# Without it, remove the `deploy.resources` block below and the container trains on CPU.
+services:
+  sudoku-train:
+    build: ./train
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./dataset_gen/output:/app/data:ro
+      - ./train/checkpoints:/app/checkpoints
+    shm_size: "2gb"
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - capabilities: [gpu]
