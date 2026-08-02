@@ -23,6 +23,14 @@ train/checkpoints/
 *.bmp
 *.webp
 
+# ...except checked-in project assets (logo, etc.)
+!assets/*.png
+!assets/*.jpg
+!assets/*.jpeg
+!assets/*.gif
+!assets/*.bmp
+!assets/*.webp
+
 # Python
 __pycache__/
 *.pyc

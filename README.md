@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="assets/logo.svg" alt="sudoku_net logo" width="160">
+</p>
+
 # sudoku_net
 
 An end-to-end pipeline that teaches a CNN to read a Sudoku board from a screenshot: play the game, render thousands of labeled board images from it, train a model to recognize all 81 cells, then solve.
