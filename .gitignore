@@ -7,6 +7,22 @@ dataset_gen/output/
 # Training artifacts (regenerate with train/train.py)
 train/checkpoints/
 
+# Neural network weights
+*.pt
+*.pth
+*.onnx
+*.h5
+*.ckpt
+*.safetensors
+
+# Images
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.bmp
+*.webp
+
 # Python
 __pycache__/
 *.pyc
