@@ -3,7 +3,7 @@
 
 /**
  * Generates a labeled Sudoku board image database by driving the real
- * game (games/sudoku) in a headless browser. Each sample:
+ * game (game-library/games/sudoku) in a headless browser. Each sample:
  *   - picks a random difficulty, background gradient, cell font size, theme
  *     (dark/light), high-contrast mode, and font family
  *   - asks the game's own generator/solver for a puzzle
@@ -16,7 +16,7 @@
  * Options:
  *   --count <n>         Number of images to generate (required)
  *   --out <dir>          Output directory (default: ./output)
- *   --game <path>        Path to the sudoku index.html (default: ../sudoku/index.html)
+ *   --game <path>        Path to the sudoku index.html (default: ../game-library/games/sudoku/index.html)
  *   --difficulty <d>     easy|medium|hard|expert|mixed (default: mixed)
  *   --concurrency <n>    Parallel browser pages (default: 4)
  *   --min-font <px>      Minimum cell font size in px (default: 14)
@@ -38,7 +38,7 @@ function parseArgs(argv) {
   const args = {
     count: null,
     out: path.join(__dirname, 'output'),
-    game: path.join(__dirname, '..', 'sudoku', 'index.html'),
+    game: path.join(__dirname, '..', 'game-library', 'games', 'sudoku', 'index.html'),
     difficulty: 'mixed',
     concurrency: 4,
     minFont: 14,

@@ -10,7 +10,7 @@ An end-to-end pipeline that teaches a CNN to read a Sudoku board from a screensh
 
 | Folder | What it is |
 |---|---|
-| [`sudoku/`](https://github.com/leo-bonacini/sudoku) | The Sudoku game itself (vanilla HTML/CSS/JS, no build step). Pulled in as a git submodule. |
+| [`game-library/`](https://github.com/leo-bonacini/game-library) | The game library; the Sudoku game lives in `game-library/games/sudoku` (vanilla HTML/CSS/JS, no build step). Pulled in as a git submodule. |
 | `dataset_gen/` | Drives the game in a headless browser (Playwright) to render labeled board images: random theme, font, rotation, and opacity per sample. |
 | `train/` | A fully-convolutional CNN (PyTorch) that reads a rendered board image and predicts all 81 cells, plus a Flask dashboard/server for training, live introspection, and image-to-solve. |
 
